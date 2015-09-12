@@ -1,0 +1,22 @@
+{
+  "name": "rooster",
+  "version": "0.0.1",
+  "authors": [
+    "Luna Moonfang"
+  ],
+  "description": "Polymer rooster site voor oa. Alfa College",
+  "main": "src/index.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "iron-elements": "PolymerElements/iron-elements#~1.0.3",
+    "paper-elements": "PolymerElements/paper-elements#~1.0.5",
+    "polymer": "Polymer/polymer#~1.1.3"
+  }
+}

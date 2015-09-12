@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+        <title>Luna Roosters</title>
+
+        <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
+        <link rel="import" href="/import/elements.html">
+
+        <style is="custom-style">
+            html, body {
+                height: 100%;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                font-weight: 100;
+                font-family: 'Lato';
+            }
+
+            table {
+                display: inline-table;
+                text-align: center;
+                width: 19%;
+                padding-bottom: 40px;
+            }
+
+            th {
+                width: 200px;
+                padding: 20px 0;
+                border-bottom: 1px solid #80DEEA;
+            }
+
+            paper-toolbar {
+                --paper-toolbar-background: #2196F3;
+            }
+
+            paper-card {
+                text-align: left;
+            }
+
+            paper-card.active {
+                --paper-card: {
+                    background: #00BCD4;
+                    color: white;
+                }
+            }
+
+            paper-material {
+                width: 1000px;
+                margin: 0 auto;
+                text-align: center;
+            }
+
+            paper-item {
+                --paper-item: {
+                    min-height: 0;
+                    padding: 0 10px;
+                }
+            }
+
+            paper-item.dropdown-item {
+                --paper-item: {
+                    min-height: 0;
+                    width: 160px;
+                }
+            }
+
+            paper-input {
+                --paper-input-container: {
+                    width: 50%;
+                    min-width: 250px;
+                    margin: 0 auto;
+                }
+            }
+
+            .fa {
+                width: 30px;
+            }
+
+            a {
+                color: black;
+                text-decoration: none;
+            }
+        </style>
+    </head>
+    <body unresolved class="fullbleed layout">
+        <paper-header-panel mode="waterfall">
+            <paper-toolbar>
+                <div class="title">Something - Week LOL</div>
+            </paper-toolbar>
+
+            <div class="content fit">
+                <paper-material elevation="3">
+
+                    <search-bar></search-bar>
+
+
+                </paper-material>
+            </div>
+        </paper-header-panel>
+    </body>
+</html>
