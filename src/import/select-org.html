@@ -1,0 +1,52 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="select-org">
+
+        <style>
+
+        </style>
+        <template>
+
+                <iron-ajax
+                        auto
+                        url="http://xedule.novaember.com/organisations.json"
+                        handle-as="json"
+                        last-response="{{organisations}}">
+                </iron-ajax>
+
+                <paper-dropdown-menu label="Pick an organisation:" on-iron-select="_selectOrganisation" selected="{{selected}}">
+                        <paper-menu class="dropdown-content">
+                                <template is="dom-repeat" items="{{organisations}}">
+                                        <paper-item value="{{item.id}}">{{item.name}}</paper-item>
+                                </template>
+                        </paper-menu>
+                </paper-dropdown-menu>
+
+        </template>
+        <script>
+                Polymer({
+                        is: "select-org",
+                        _selectOrganisation: function(e) {
+                                // The organisation header element
+                                header = document.getElementById('org');
+                                // The selected item in the dropdown menu
+                                item   = e.detail.item;
+
+                                // Debug
+                                console.log(item.value);
+                                console.log(item.innerText);
+
+                                // Append the organisation name to the header
+                                header.innerText = " - " + item.innerText;
+
+                                // Reset the other header items
+                                document.getElementById('class').innerText = "";
+                                document.getElementById('week').innerText = "";
+                        }
+                });
+        </script>
+</dom-module>
