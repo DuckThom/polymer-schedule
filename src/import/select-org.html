@@ -25,7 +25,7 @@
                 </iron-ajax>
 
                 <paper-dropdown-menu label="Pick an organisation:" on-iron-select="_selectOrganisation">
-                        <paper-menu class="dropdown-content">
+                        <paper-menu class="dropdown-content" selected$="{{selected}}" attr-for-selected="value">
                                 <template is="dom-repeat" items="{{organisations}}" sort="_sort">
                                         <paper-item value="{{item.id}}">{{item.name}}</paper-item>
                                 </template>
@@ -38,8 +38,20 @@
         <script>
                 Polymer({
                         is: "select-org",
+                        properties: {
+                                selected: {
+                                        type: String,
+                                        notify: true
+                                }
+                        },
                         ready: function() {
                                 this.locationHidden = true;
+                        },
+                        attached: function () {
+                                this.async(function () {
+                                        if (typeof location.pathname.split("/")[1] != 'undefined')
+                                                this.selected = location.pathname.split("/")[1];
+                                });
                         },
                         _selectOrganisation: function(e) {
                                 // The organisation header element
@@ -60,6 +72,9 @@
                                 document.getElementById('location').innerText = "";
                                 document.getElementById('class').innerText = "";
                                 document.getElementById('week').innerText = "";
+
+                                // Set the url
+                                history.pushState({}, 'Xedule 2.0', '/' + item.value);
                         },
                         _sort(a, b) {
                                 if (a['name'].toLowerCase() === b['name'].toLowerCase()) {

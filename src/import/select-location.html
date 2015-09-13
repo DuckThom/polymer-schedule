@@ -27,7 +27,7 @@
                 <hr />
 
                 <paper-dropdown-menu label="Select a location:" on-iron-select="_selectLocation">
-                        <paper-menu class="dropdown-content">
+                        <paper-menu class="dropdown-content" selected$="{{selected}}" attr-for-selected="value">
                                 <template is="dom-repeat" items="{{locations}}" sort="_sort">
                                         <paper-item value="{{item.id}}">{{item.name}}</paper-item>
                                 </template>
@@ -50,7 +50,17 @@
                                         type: Boolean,
                                         notify: true,
                                         observer: '_changeVisibility'
+                                },
+                                selected: {
+                                        type: String,
+                                        notify: true
                                 }
+                        },
+                        attached: function () {
+                                this.async(function () {
+                                        if (typeof location.pathname.split("/")[2] != 'undefined')
+                                                this.selected = location.pathname.split("/")[2];
+                                });
                         },
                         _orgChanged: function(organisationID) {
                                 this.$.locationAjax.url = "http://xedule.novaember.com/" + organisationID + "/locations.json";
@@ -79,6 +89,9 @@
                                 // Reset the other header items
                                 document.getElementById('class').innerText = "";
                                 document.getElementById('week').innerText = "";
+
+                                // Set the url
+                                history.pushState({}, "Xedule 2.0", '/' + location.pathname.split("/")[1] + '/' + item.value);
                         },
                         _sort(a, b) {
                                 if (a['name'].toLowerCase() === b['name'].toLowerCase()) {

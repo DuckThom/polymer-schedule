@@ -1,0 +1,123 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="select-attendee">
+
+        <style>
+                paper-item {
+                        --paper-item: {
+                                white-space: nowrap;
+                                width: 150px;
+                        }
+                }
+
+                paper-dropdown-menu {
+                        --paper-dropdown-menu: {
+                                display: inline-block;
+                        }
+                }
+        </style>
+        <template>
+
+                <iron-ajax
+                        auto
+                        handle-as="json"
+                        last-response="{{schedule}}">
+                </iron-ajax>
+
+                <hr />
+
+                <table>
+                        <thead>
+                                <tr>
+                                        <th>
+
+                                        </th>
+                                </tr>
+                        </thead>
+                </table>
+
+
+        </template>
+        <script>
+                Polymer({
+                        is: "select-attendee",
+                        properties: {
+                                organisation: {
+                                        type: String,
+                                        notify: true,
+                                        observer: '_orgChanged'
+                                },
+                                location: {
+                                        type: String,
+                                        notify: true,
+                                        observer: '_locationChanged'
+                                },
+                                attendee: {
+                                        type: String,
+                                        notify: true,
+                                        observer: '_attendeeChanged'
+                                }
+                                hidden: {
+                                        type: Boolean,
+                                        notify: true,
+                                        observer: '_changeVisibility'
+                                }
+                        },
+                        _orgChanged: function(organisationID) {
+                                this.hidden = true;
+                        },
+                        _locationChanged: function(locationID) {
+                                this.hidden = true;
+                        },
+                        _attendeeChanged: function(attendeeID) {
+                                this.$.attendeeAjax.url = "http://xedule.novaember.com/" + this.organisationID + "/" + this.locationID + "/attendees.json";
+
+                                this.hidden = false;
+                        }
+                        _changeVisibility: function(hidden) {
+                                this.hidden = hidden;
+                        },
+                        _selectAttendee: function(e) {
+                                // The organisation header element
+                                header = document.getElementById('class');
+                                // The selected item in the dropdown menu
+                                item   = e.detail.item;
+
+                                // Update the value for the location dropdown menu
+                                this.attendee = item.value;
+
+                                // Change the location dropdown visibility
+                                this.scheduleHidden = false;
+
+                                // Append the organisation name to the header
+                                header.innerText = " - " + item.innerText;
+
+                                // Reset the other header items
+                                document.getElementById('week').innerText = "";
+
+                                // Set the url
+                                history.pushState({}, "Xedule 2.0", '/' + location.pathname.split("/")[1] + '/' + location.pathname.split("/")[2] + '/' + item.value);
+                        },
+                        filterClass(item) {
+                                return item.type == 'class';
+                        },
+                        filterFacility(item) {
+                                return item.type == 'facility';
+                        },
+                        filterStaff(item) {
+                                return item.type == 'staff';
+                        },
+                        _sort(a, b) {
+                                if (a['name'].toLowerCase() === b['name'].toLowerCase()) {
+                                        return 0;
+                                } else {
+                                        return (a['name'].toLowerCase() < b['name'].toLowerCase()) ? -1 : 1;
+                                }
+                        }
+                });
+        </script>
+</dom-module>

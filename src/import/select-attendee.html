@@ -32,7 +32,7 @@
                 <hr />
 
                 <paper-dropdown-menu label="Select a class:" on-iron-select="_selectAttendee">
-                        <paper-menu class="dropdown-content">
+                        <paper-menu class="dropdown-content" selected$="{{selected}}" attr-for-selected="value">
                                 <template is="dom-repeat" items="{{attendees}}" filter="filterClass" sort="_sort">
                                         <paper-item value="{{item.id}}">{{item.name}}</paper-item>
                                 </template>
@@ -42,7 +42,7 @@
                 OR
 
                 <paper-dropdown-menu label="Select a classroom:" on-iron-select="_selectAttendee">
-                        <paper-menu class="dropdown-content">
+                        <paper-menu class="dropdown-content" selected$="{{selected}}" attr-for-selected="value">
                                 <template is="dom-repeat" items="{{attendees}}" filter="filterFacility" sort="_sort">
                                         <paper-item value="{{item.id}}">{{item.name}}</paper-item>
                                 </template>
@@ -52,7 +52,7 @@
                 OR
 
                 <paper-dropdown-menu label="Select a teacher:" on-iron-select="_selectAttendee">
-                        <paper-menu class="dropdown-content">
+                        <paper-menu class="dropdown-content" selected$="{{selected}}" attr-for-selected="value">
                                 <template is="dom-repeat" items="{{attendees}}" filter="filterStaff" sort="_sort">
                                         <paper-item value="{{item.id}}">{{item.name}}</paper-item>
                                 </template>
@@ -82,11 +82,17 @@
                                         observer: '_changeVisibility'
                                 }
                         },
+                        attached: function () {
+                                this.async(function () {
+                                        if (typeof location.pathname.split("/")[3] != 'undefined')
+                                                this.selected = location.pathname.split("/")[3];
+                                });
+                        },
                         _orgChanged: function(organisationID) {
                                 this.hidden = true;
                         },
                         _locationChanged: function(locationID) {
-                                this.$.attendeeAjax.url = "http://xedule.novaember.com/" + this.organisationID + "/" + locationID + "/attendees.json";
+                                this.$.attendeeAjax.url = "http://xedule.novaember.com/" + this.organisation + "/" + locationID + "/attendees.json";
 
                                 this.hidden = false;
                         },
@@ -110,6 +116,9 @@
 
                                 // Reset the other header items
                                 document.getElementById('week').innerText = "";
+
+                                // Set the url
+                                history.pushState({}, "Xedule 2.0", '/' + location.pathname.split("/")[1] + '/' + location.pathname.split("/")[2] + '/' + item.value);
                         },
                         filterClass(item) {
                                 return item.type == 'class';
