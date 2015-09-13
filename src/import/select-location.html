@@ -4,9 +4,9 @@
 
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 
-<link rel="import" href="select-location.html">
+<link rel="import" href="select-attendee.html">
 
-<dom-module id="select-org">
+<dom-module id="select-location">
 
         <style>
                 paper-item {
@@ -19,45 +19,64 @@
 
                 <iron-ajax
                         auto
-                        url="http://xedule.novaember.com/organisations.json"
                         handle-as="json"
-                        last-response="{{organisations}}">
+                        last-response="{{locations}}"
+                        id="locationAjax">
                 </iron-ajax>
 
-                <paper-dropdown-menu label="Pick an organisation:" on-iron-select="_selectOrganisation">
+                <hr />
+
+                <paper-dropdown-menu label="Select a location:" on-iron-select="_selectLocation">
                         <paper-menu class="dropdown-content">
-                                <template is="dom-repeat" items="{{organisations}}" sort="_sort">
+                                <template is="dom-repeat" items="{{locations}}" sort="_sort">
                                         <paper-item value="{{item.id}}">{{item.name}}</paper-item>
                                 </template>
                         </paper-menu>
                 </paper-dropdown-menu>
 
-                <select-location organisation$="{{organisation}}" hidden$="{{locationHidden}}"></select-location>
+                <select-attendee organisation$="{{organisationID}}" location$="{{location}}" hidden$="{{attendeeHidden}}"></select-attendee>
 
         </template>
         <script>
                 Polymer({
-                        is: "select-org",
-                        ready: function() {
-                                this.locationHidden = true;
+                        is: "select-location",
+                        properties: {
+                                organisation: {
+                                        type: String,
+                                        notify: true,
+                                        observer: '_orgChanged'
+                                },
+                                hidden: {
+                                        type: Boolean,
+                                        notify: true,
+                                        observer: '_changeVisibility'
+                                }
                         },
-                        _selectOrganisation: function(e) {
+                        _orgChanged: function(organisationID) {
+                                this.$.locationAjax.url = "http://xedule.novaember.com/" + organisationID + "/locations.json";
+
+                                this.hidden = false;
+                                this.attendeeHidden = true;
+                        },
+                        _changeVisibility: function(hidden) {
+                                this.hidden = hidden;
+                        },
+                        _selectLocation: function(e) {
                                 // The organisation header element
-                                header = document.getElementById('org');
+                                header = document.getElementById('location');
                                 // The selected item in the dropdown menu
                                 item   = e.detail.item;
 
-                                // Update the value for the location dropdown menu
-                                this.organisation = item.value;
+                                // Update the value for the attendee dropdown menu
+                                this.location = item.value;
 
-                                // Change the location dropdown visibility
-                                this.locationHidden = false;
+                                // Change the attendee dropdowns visibility
+                                this.attendeeHidden = false;
 
                                 // Append the organisation name to the header
                                 header.innerText = " - " + item.innerText;
 
                                 // Reset the other header items
-                                document.getElementById('location').innerText = "";
                                 document.getElementById('class').innerText = "";
                                 document.getElementById('week').innerText = "";
                         },

@@ -1,0 +1,132 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="select-attendee">
+
+        <style>
+                paper-item {
+                        --paper-item: {
+                                white-space: nowrap;
+                                width: 150px;
+                        }
+                }
+
+                paper-dropdown-menu {
+                        --paper-dropdown-menu: {
+                                display: inline-block;
+                        }
+                }
+        </style>
+        <template>
+
+                <iron-ajax
+                        auto
+                        handle-as="json"
+                        last-response="{{attendees}}"
+                        id="attendeeAjax">
+                </iron-ajax>
+
+                <hr />
+
+                <paper-dropdown-menu label="Select a class:" on-iron-select="_selectAttendee">
+                        <paper-menu class="dropdown-content">
+                                <template is="dom-repeat" items="{{attendees}}" filter="filterClass" sort="_sort">
+                                        <paper-item value="{{item.id}}">{{item.name}}</paper-item>
+                                </template>
+                        </paper-menu>
+                </paper-dropdown-menu>
+
+                OR
+
+                <paper-dropdown-menu label="Select a classroom:" on-iron-select="_selectAttendee">
+                        <paper-menu class="dropdown-content">
+                                <template is="dom-repeat" items="{{attendees}}" filter="filterFacility" sort="_sort">
+                                        <paper-item value="{{item.id}}">{{item.name}}</paper-item>
+                                </template>
+                        </paper-menu>
+                </paper-dropdown-menu>
+
+                OR
+
+                <paper-dropdown-menu label="Select a teacher:" on-iron-select="_selectAttendee">
+                        <paper-menu class="dropdown-content">
+                                <template is="dom-repeat" items="{{attendees}}" filter="filterStaff" sort="_sort">
+                                        <paper-item value="{{item.id}}">{{item.name}}</paper-item>
+                                </template>
+                        </paper-menu>
+                </paper-dropdown-menu>
+
+                <schedule organisation$="{{organisationID}}" location$="{{location}}" attendee$={{attendee}} hidden$="{{scheduleHidden}}"></schedule>
+
+        </template>
+        <script>
+                Polymer({
+                        is: "select-attendee",
+                        properties: {
+                                organisation: {
+                                        type: String,
+                                        notify: true,
+                                        observer: '_orgChanged'
+                                },
+                                location: {
+                                        type: String,
+                                        notify: true,
+                                        observer: '_locationChanged'
+                                },
+                                hidden: {
+                                        type: Boolean,
+                                        notify: true,
+                                        observer: '_changeVisibility'
+                                }
+                        },
+                        _orgChanged: function(organisationID) {
+                                this.hidden = true;
+                        },
+                        _locationChanged: function(locationID) {
+                                this.$.attendeeAjax.url = "http://xedule.novaember.com/" + this.organisationID + "/" + locationID + "/attendees.json";
+
+                                this.hidden = false;
+                        },
+                        _changeVisibility: function(hidden) {
+                                this.hidden = hidden;
+                        },
+                        _selectAttendee: function(e) {
+                                // The organisation header element
+                                header = document.getElementById('class');
+                                // The selected item in the dropdown menu
+                                item   = e.detail.item;
+
+                                // Update the value for the location dropdown menu
+                                this.attendee = item.value;
+
+                                // Change the location dropdown visibility
+                                this.scheduleHidden = false;
+
+                                // Append the organisation name to the header
+                                header.innerText = " - " + item.innerText;
+
+                                // Reset the other header items
+                                document.getElementById('week').innerText = "";
+                        },
+                        filterClass(item) {
+                                return item.type == 'class';
+                        },
+                        filterFacility(item) {
+                                return item.type == 'facility';
+                        },
+                        filterStaff(item) {
+                                return item.type == 'staff';
+                        },
+                        _sort(a, b) {
+                                if (a['name'].toLowerCase() === b['name'].toLowerCase()) {
+                                        return 0;
+                                } else {
+                                        return (a['name'].toLowerCase() < b['name'].toLowerCase()) ? -1 : 1;
+                                }
+                        }
+                });
+        </script>
+</dom-module>
