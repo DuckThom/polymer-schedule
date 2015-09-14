@@ -4,6 +4,8 @@
 
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 
+<link rel="import" href="schedule.html">
+
 <dom-module id="select-attendee">
 
         <style>
@@ -59,7 +61,7 @@
                         </paper-menu>
                 </paper-dropdown-menu>
 
-                <schedule organisation$="{{organisationID}}" location$="{{location}}" attendee$={{attendee}} hidden$="{{scheduleHidden}}"></schedule>
+                <paper-schedule organisation$="{{organisation}}" location$="{{location}}" attendee$={{attendee}} hidden$="{{scheduleHidden}}"></paper-schedule>
 
         </template>
         <script>

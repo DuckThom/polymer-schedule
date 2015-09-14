@@ -4,7 +4,7 @@
 
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 
-<dom-module id="select-attendee">
+<dom-module id="paper-schedule">
 
         <style>
                 paper-item {
@@ -19,100 +19,161 @@
                                 display: inline-block;
                         }
                 }
+
+                table {
+                        display: inline-table;
+                }
         </style>
         <template>
 
                 <iron-ajax
                         auto
                         handle-as="json"
-                        last-response="parseSchedule">
+                        last-response="{{schedule}}"
+                        id="scheduleAjax">
                 </iron-ajax>
 
                 <hr />
 
-                <template is="dom-repeat" items="{{schedule}}">
+                <table>
+                        <tbody>
+                                <template is="dom-repeat" items$="{{schedule}}" filter="{{filterDay(1)}}" sort="_sort">
+                                        <tr>
+                                                <td>{{item.description}}</td>
+                                        </tr>
+                                </template>
+                        </tbody>
+                </table>
 
-                </template>
+                <table>
+                        <tbody>
+                                <template is="dom-repeat" items$="{{schedule}}" filter="{{filterDay(2)}}" sort="_sort">
+                                        <tr>
+                                                <td>{{item.description}}</td>
+                                        </tr>
+                                </template>
+                        </tbody>
+                </table>
+
+                <table>
+                        <tbody>
+                                <template is="dom-repeat" items$="{{schedule}}" filter="{{filterDay(3)}}" sort="_sort">
+                                        <tr>
+                                                <td>{{item.description}}</td>
+                                        </tr>
+                                </template>
+                        </tbody>
+                </table>
+
+                <table>
+                        <tbody>
+                                <template is="dom-repeat" items$="{{schedule}}" filter="{{filterDay(4)}}" sort="_sort">
+                                        <tr>
+                                                <td>{{item.description}}</td>
+                                        </tr>
+                                </template>
+                        </tbody>
+                </table>
+
+                <table>
+                        <tbody>
+                                <template is="dom-repeat" items$="{{schedule}}" filter="{{filterDay(5)}}" sort="_sort">
+                                        <tr>
+                                                <td>{{item.description}}</td>
+                                        </tr>
+                                </template>
+                        </tbody>
+                </table>
+
         </template>
         <script>
-        Polymer({
-                is: "select-attendee",
-                properties: {
-                        organisation: {
-                                type: String,
-                                notify: true,
-                                observer: '_orgChanged'
+                Polymer({
+                        is: "paper-schedule",
+                        properties: {
+                                organisation: {
+                                        type: String,
+                                        notify: true,
+                                        observer: '_orgChanged'
+                                },
+                                location: {
+                                        type: String,
+                                        notify: true,
+                                        observer: '_locationChanged'
+                                },
+                                attendee: {
+                                        type: String,
+                                        notify: true,
+                                        observer: '_attendeeChanged'
+                                },
+                                hidden: {
+                                        type: Boolean,
+                                        notify: true,
+                                        observer: '_changeVisibility'
+                                }
                         },
-                        location: {
-                                type: String,
-                                notify: true,
-                                observer: '_locationChanged'
+                        _orgChanged: function(organisationID) {
+                                this.hidden = true;
                         },
-                        attendee: {
-                                type: String,
-                                notify: true,
-                                observer: '_attendeeChanged'
+                        _locationChanged: function(locationID) {
+                                this.hidden = true;
+                        },
+                        _attendeeChanged: function(attendeeID) {
+                                var d  = new Date();
+
+                                if (typeof location.pathname.split("/")[4] == 'undefined')
+                                        var week = d.getWeek();
+                                else
+                                        var week = location.pathname.split("/")[4];
+
+                                this.$.scheduleAjax.url = "http://xedule.novaember.com/" + this.organisation + "/" + this.location + "/" + attendeeID + "/schedule.json?year=" + d.getFullYear() + '&week=' + week;
+
+                                this.hidden = false;
+                        },
+                        _changeVisibility: function(hidden) {
+                                this.hidden = hidden;
+                        },
+                        _changeWeek: function(e) {
+                                // The organisation header element
+                                header = document.getElementById('class');
+                                // The selected item in the dropdown menu
+                                item   = e.detail.item;
+
+                                // Update the value for the location dropdown menu
+                                this.attendee = item.value;
+
+                                // Change the location dropdown visibility
+                                this.scheduleHidden = false;
+
+                                // Append the organisation name to the header
+                                header.innerText = " - " + item.innerText;
+
+                                // Reset the other header items
+                                document.getElementById('week').innerText = "";
+
+                                // Set the url
+                                history.pushState({}, "Xedule 2.0", '/' + location.pathname.split("/")[1] + '/' + location.pathname.split("/")[2] + '/' + location.pathname.split("/")[3] + '/'+ item.value);
+                        },
+                        filterDay(day) {
+                                return function(item) {
+                                        console.log('item' + item);
+                                        console.log('day' + day);
+                                        if (day == item.day) {
+                                                return true;
+                                        } else {
+                                                return false;
+                                        }
+                                };
+                        },
+                        _sort(a, b) {
+                                if (a.id === b.id) {
+                                        return 0;
+                                } else {
+                                        return (a.id < b.id) ? -1 : 1;
+                                }
+                        },
+                        parseSchedule: function(e) {
+                                console.log(e);
                         }
-                        hidden: {
-                                type: Boolean,
-                                notify: true,
-                                observer: '_changeVisibility'
-                        }
-                },
-                _orgChanged: function(organisationID) {
-                        this.hidden = true;
-                },
-                _locationChanged: function(locationID) {
-                        this.hidden = true;
-                },
-                _attendeeChanged: function(attendeeID) {
-                        this.$.attendeeAjax.url = "http://xedule.novaember.com/" + this.organisationID + "/" + this.locationID + "/attendees.json";
-
-                        this.hidden = false;
-                }
-                _changeVisibility: function(hidden) {
-                        this.hidden = hidden;
-                },
-                _selectAttendee: function(e) {
-                        // The organisation header element
-                        header = document.getElementById('class');
-                        // The selected item in the dropdown menu
-                        item   = e.detail.item;
-
-                        // Update the value for the location dropdown menu
-                        this.attendee = item.value;
-
-                        // Change the location dropdown visibility
-                        this.scheduleHidden = false;
-
-                        // Append the organisation name to the header
-                        header.innerText = " - " + item.innerText;
-
-                        // Reset the other header items
-                        document.getElementById('week').innerText = "";
-
-                        // Set the url
-                        history.pushState({}, "Xedule 2.0", '/' + location.pathname.split("/")[1] + '/' + location.pathname.split("/")[2] + '/' + item.value);
-                },
-                filterClass(item) {
-                        return item.type == 'class';
-                },
-                filterFacility(item) {
-                        return item.type == 'facility';
-                },
-                filterStaff(item) {
-                        return item.type == 'staff';
-                },
-                _sort(a, b) {
-                        if (a['name'].toLowerCase() === b['name'].toLowerCase()) {
-                                return 0;
-                        } else {
-                                return (a['name'].toLowerCase() < b['name'].toLowerCase()) ? -1 : 1;
-                        }
-                },
-                parseSchedule: function(e) {
-                        console.log(e);
-                }
-        });
+                });
         </script>
 </dom-module>
