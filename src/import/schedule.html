@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
@@ -20,8 +21,20 @@
                         }
                 }
 
+                paper-card {
+                        --paper-card: {
+                                width: 150px;
+                        }
+                }
+
                 table {
                         display: inline-table;
+                        width: 150px;
+                        padding-bottom: 50px;
+                }
+
+                th {
+                        padding: 20px 0;
                 }
         </style>
         <template>
@@ -36,50 +49,85 @@
                 <hr />
 
                 <table>
+                        <thead>
+                                <tr><th>Monday</th></tr>
+                        </thead>
                         <tbody>
                                 <template is="dom-repeat" items$="{{schedule}}" filter="{{filterDay(1)}}" sort="_sort">
                                         <tr>
-                                                <td>{{item.description}}</td>
+                                                <td>
+                                                        <paper-card heading="{{item.description}}">
+                                                                <div class="card-content"><span>{{item.facilities}}</span>&nbsp;</div>
+                                                        </paper-card>
+                                                </td>
                                         </tr>
                                 </template>
                         </tbody>
                 </table>
 
                 <table>
+                        <thead>
+                                <tr><th>Tuesday</th></tr>
+                        </thead>
                         <tbody>
                                 <template is="dom-repeat" items$="{{schedule}}" filter="{{filterDay(2)}}" sort="_sort">
                                         <tr>
-                                                <td>{{item.description}}</td>
+                                                <td>
+                                                        <paper-card heading="{{item.description}}">
+                                                                <div class="card-content"><span>{{item.facilities}}</span>&nbsp;</div>
+                                                        </paper-card>
+                                                </td>
                                         </tr>
                                 </template>
                         </tbody>
                 </table>
 
                 <table>
+                        <thead>
+                                <tr><th>Wednesday</th></tr>
+                        </thead>
                         <tbody>
                                 <template is="dom-repeat" items$="{{schedule}}" filter="{{filterDay(3)}}" sort="_sort">
                                         <tr>
-                                                <td>{{item.description}}</td>
+                                                <td>
+                                                        <paper-card heading="{{item.description}}">
+                                                                <div class="card-content"><span>{{item.facilities}}</span>&nbsp;</div>
+                                                        </paper-card>
+                                                </td>
                                         </tr>
                                 </template>
                         </tbody>
                 </table>
 
                 <table>
+                        <thead>
+                                <tr><th>Thursday</th></tr>
+                        </thead>
                         <tbody>
                                 <template is="dom-repeat" items$="{{schedule}}" filter="{{filterDay(4)}}" sort="_sort">
                                         <tr>
-                                                <td>{{item.description}}</td>
+                                                <td>
+                                                        <paper-card heading="{{item.description}}">
+                                                                <div class="card-content"><span>{{item.facilities}}</span>&nbsp;</div>
+                                                        </paper-card>
+                                                </td>
                                         </tr>
                                 </template>
                         </tbody>
                 </table>
 
                 <table>
+                        <thead>
+                                <tr><th>Friday</th></tr>
+                        </thead>
                         <tbody>
                                 <template is="dom-repeat" items$="{{schedule}}" filter="{{filterDay(5)}}" sort="_sort">
                                         <tr>
-                                                <td>{{item.description}}</td>
+                                                <td>
+                                                        <paper-card heading="{{item.description}}">
+                                                                <div class="card-content"><span>{{item.facilities}}</span>&nbsp;</div>
+                                                        </paper-card>
+                                                </td>
                                         </tr>
                                 </template>
                         </tbody>
@@ -120,10 +168,7 @@
                         _attendeeChanged: function(attendeeID) {
                                 var d  = new Date();
 
-                                if (typeof location.pathname.split("/")[4] == 'undefined')
-                                        var week = d.getWeek();
-                                else
-                                        var week = location.pathname.split("/")[4];
+                                var week = d.getWeek();
 
                                 this.$.scheduleAjax.url = "http://xedule.novaember.com/" + this.organisation + "/" + this.location + "/" + attendeeID + "/schedule.json?year=" + d.getFullYear() + '&week=' + week;
 
@@ -132,31 +177,8 @@
                         _changeVisibility: function(hidden) {
                                 this.hidden = hidden;
                         },
-                        _changeWeek: function(e) {
-                                // The organisation header element
-                                header = document.getElementById('class');
-                                // The selected item in the dropdown menu
-                                item   = e.detail.item;
-
-                                // Update the value for the location dropdown menu
-                                this.attendee = item.value;
-
-                                // Change the location dropdown visibility
-                                this.scheduleHidden = false;
-
-                                // Append the organisation name to the header
-                                header.innerText = " - " + item.innerText;
-
-                                // Reset the other header items
-                                document.getElementById('week').innerText = "";
-
-                                // Set the url
-                                history.pushState({}, "Xedule 2.0", '/' + location.pathname.split("/")[1] + '/' + location.pathname.split("/")[2] + '/' + location.pathname.split("/")[3] + '/'+ item.value);
-                        },
                         filterDay(day) {
                                 return function(item) {
-                                        console.log('item' + item);
-                                        console.log('day' + day);
                                         if (day == item.day) {
                                                 return true;
                                         } else {
@@ -165,15 +187,35 @@
                                 };
                         },
                         _sort(a, b) {
-                                if (a.id === b.id) {
+                                if (a.start === b.start) {
                                         return 0;
                                 } else {
-                                        return (a.id < b.id) ? -1 : 1;
+                                        return (a.start < b.start) ? -1 : 1;
                                 }
                         },
                         parseSchedule: function(e) {
                                 console.log(e);
                         }
                 });
+
+                window.onhashchange = function() {
+                        hash = location.href.split('#')[1];
+
+                        if (Number.isInteger(parseInt(hash))) {
+                                var d = new Date();
+
+                                // Try to fetch the new schedule
+                                document.getElementById('scheduleAjax').url = "http://xedule.novaember.com/" + location.pathname.split("/")[1] + "/" + location.pathname.split("/")[2] + "/" + location.pathname.split("/")[3] + "/schedule.json?year=" + d.getFullYear() + '&week=' + hash;
+
+                                // The organisation header element
+                                header = document.getElementById('week');
+
+                                // Append the organisation name to the header
+                                header.innerText = " - " + hash;
+
+                                // Set the url
+                                history.pushState({}, "Xedule 2.0", '/' + location.pathname.split("/")[1] + '/' + location.pathname.split("/")[2] + '/' + location.pathname.split("/")[3] + '#'+ hash);
+                        }
+                }
         </script>
 </dom-module>
